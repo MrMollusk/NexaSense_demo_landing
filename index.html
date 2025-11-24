@@ -7,24 +7,24 @@
   <style>
     :root {
       /* Brand / base */
-      --primary-blue: #1d9bf0;   /* main brand blue */
-      --light-blue: #a5d8ff;     /* soft info/“check” blue */
-      --bg-main: #eaf4ff;        /* page background */
+      --primary-blue: #1d9bf0;
+      --light-blue: #a5d8ff;
+      --bg-main: #eaf4ff;
       --bg-card: #ffffff;
-      --bg-header: #1d9bf0;      /* header bar */
-      --text-main: #0b1120;      /* dark navy text */
-      --text-subtle: #64748b;    /* blue-grey */
+      --bg-header: #1d9bf0;
+      --text-main: #0b1120;
+      --text-subtle: #64748b;
       --border-subtle: #dbeafe;
 
-      /* Critical fall alert (kept red for clarity) */
-      --fall-bg: #b91c1c;        /* red */
+      /* Critical fall alert (kept red) */
+      --fall-bg: #b91c1c;
       --fall-light: #fee2e2;
 
       /* Status colours */
-      --ok-bg: #1d9bf0;          /* blue “OK” */
-      --check-bg: #a5d8ff;       /* pale blue “CHECK” */
-      --offline-bg: #cbd5f5;     /* bluish grey */
-      --empty-bg: #f8fafc;       /* almost white */
+      --ok-bg: #1d9bf0;
+      --check-bg: #a5d8ff;
+      --offline-bg: #cbd5f5;
+      --empty-bg: #f8fafc;
     }
 
     * {
@@ -78,17 +78,22 @@
       gap: 12px;
     }
 
-    .brand-mark {
-      width: 30px;
-      height: 30px;
+    .brand-logo {
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       background: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--primary-blue);
+      padding: 3px;
+      box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.35);
+    }
+
+    .brand-logo img {
+      max-width: 100%;
+      max-height: 100%;
+      display: block;
     }
 
     .header-left-text {
@@ -450,8 +455,9 @@
     <!-- Header -->
     <header class="header">
       <div class="header-left">
-        <!-- Simple circular mark; swap for your logo img if you want -->
-        <div class="brand-mark">N</div>
+        <div class="brand-logo">
+          <img src="nexasense-logo.png" alt="NexaSense logo">
+        </div>
         <div class="header-left-text">
           <div class="brand">NexaSense</div>
           <div class="subheader">Floor 1 • 18 rooms</div>
