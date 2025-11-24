@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NexaSense – Floor 1 Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg-main: #e5e7eb;      /* slate-200 */
+      --bg-card: #ffffff;
+      --bg-header: #020617;    /* slate-950 */
+      --text-main: #020617;
+      --text-subtle: #6b7280;  /* gray-500 */
+      --border-subtle: #e5e7eb;
+
+      --fall-bg: #b91c1c;      /* red-700 */
+      --fall-light: #fee2e2;   /* red-100 */
+
+      --ok-bg: #10b981;        /* emerald-500 */
+      --check-bg: #f59e0b;     /* amber-500 */
+      --offline-bg: #9ca3af;   /* gray-400 */
+      --empty-bg: #f3f4f6;     /* gray-100 */
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      color: var(--text-main);
+      background-color: var(--bg-main);
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      padding: 16px;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 1200px;
+      background: var(--bg-card);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow:
+        0 10px 30px rgba(15, 23, 42, 0.3),
+        0 0 0 1px rgba(15, 23, 42, 0.06);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+
+    .header {
+      background: var(--bg-header);
+      color: #f9fafb;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .brand {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .subheader {
+      font-size: 13px;
+      color: #9ca3af;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      font-size: 13px;
+    }
+
+    .time-block {
+      text-align: right;
+      line-height: 1.2;
+    }
+
+    .time-block-main {
+      font-size: 14px;
+    }
+
+    .time-block-sub {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .user-block {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: #1f2933;
+    }
+
+    .user-label {
+      font-size: 13px;
+      color: #e5e7eb;
+    }
+
+    /* Layout */
+
+    .main {
+      flex: 1;
+      padding: 16px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .column-left {
+      flex: 0 0 340px;
+      max-width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .column-right {
+      flex: 1 1 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .section-title {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .badge-red {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .badge-green {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    /* Alerts */
+
+    .alerts-list {
+      max-height: 460px;
+      overflow-y: auto;
+      padding-right: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .alert-card {
+      border-radius: 12px;
+      border: 1px solid #fecaca;
+      background: var(--fall-light);
+      overflow: hidden;
+      font-size: 14px;
+    }
+
+    .alert-banner {
+      background: var(--fall-bg);
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 12px;
+    }
+
+    .alert-body {
+      padding: 8px 12px 4px 12px;
+    }
+
+    .alert-top-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .alert-room {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .alert-time {
+      font-size: 11px;
+      color: #4b5563;
+      white-space: nowrap;
+    }
+
+    .alert-sub {
+      font-size: 11px;
+      color: #4b5563;
+      margin-bottom: 4px;
+    }
+
+    .alert-footer {
+      padding: 0 12px 10px 12px;
+    }
+
+    .alert-button {
+      width: 100%;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--fall-bg);
+      background: var(--fall-bg);
+      color: white;
+      cursor: pointer;
+    }
+
+    .alert-button.ack {
+      border-color: #d1d5db;
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .alert-empty {
+      border-radius: 12px;
+      border: 1px solid #bbf7d0;
+      background: #dcfce7;
+      color: #166534;
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+
+    /* Floor overview */
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 11px;
+      color: var(--text-subtle);
+      justify-content: flex-end;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .legend-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      background: var(--bg-main);
+    }
+
+    .legend-fall { background: var(--fall-bg); }
+    .legend-check { background: var(--check-bg); }
+    .legend-ok { background: var(--ok-bg); }
+    .legend-offline { background: var(--offline-bg); }
+
+    .rooms-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    @media (min-width: 768px) {
+      .rooms-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .room-tile {
+      border-radius: 14px;
+      padding: 10px 10px 10px 10px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+      text-align: left;
+      background: var(--empty-bg);
+      color: #111827;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 80px;
+      cursor: default;
+      outline: none;
+    }
+
+    .room-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .room-number {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .room-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #9ca3af;
+    }
+
+    .room-status {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    /* Status color variants */
+
+    .status-fall {
+      background: var(--fall-bg);
+      color: #f9fafb;
+      border-color: var(--fall-bg);
+    }
+    .status-fall .room-dot {
+      background: #f9fafb;
+    }
+
+    .status-ok {
+      background: var(--ok-bg);
+      color: #f9fafb;
+      border-color: var(--ok-bg);
+    }
+    .status-ok .room-dot {
+      background: #f9fafb;
+    }
+
+    .status-check {
+      background: var(--check-bg);
+      color: #111827;
+      border-color: var(--check-bg);
+    }
+    .status-check .room-dot {
+      background: #111827cc;
+    }
+
+    .status-offline {
+      background: var(--offline-bg);
+      color: #111827;
+      border-color: var(--offline-bg);
+    }
+    .status-offline .room-dot {
+      background: #111827;
+    }
+
+    .status-empty {
+      background: var(--empty-bg);
+      color: #6b7280;
+      border-color: #e5e7eb;
+    }
+    .status-empty .room-dot {
+      background: #9ca3af;
+    }
+
+    /* Scrollbar tweak */
+    .alerts-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    .alerts-list::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .alerts-list::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 999px;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 8px;
+      }
+      .main {
+        flex-direction: column;
+      }
+      .column-left {
+        flex: 1 1 auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <div class="brand">NexaSense</div>
+        <div class="subheader">Floor 1 • 18 rooms</div>
+      </div>
+      <div class="header-right">
+        <div class="time-block">
+          <div class="time-block-main" id="clock-time">10:45</div>
+          <div class="time-block-sub" id="clock-date">Wed 12 Mar</div>
+        </div>
+        <div class="user-block">
+          <div class="avatar"></div>
+          <div class="user-label">Nurse station</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main layout -->
+    <main class="main">
+      <!-- Left: Active falls -->
+      <section class="column-left">
+        <div class="section-header">
+          <div class="section-title">Active falls</div>
+          <div id="alerts-badge" class="badge badge-green">0 active</div>
+        </div>
+        <div id="alerts-list" class="alerts-list">
+          <!-- Alerts injected by JS -->
+        </div>
+      </section>
+
+      <!-- Right: Floor overview -->
+      <section class="column-right">
+        <div class="section-header">
+          <div class="section-title">Floor 1 overview</div>
+          <div class="legend">
+            <span class="legend-item">
+              <span class="legend-swatch legend-fall"></span> FALL
+            </span>
+            <span class="legend-item">
+              <span class="legend-swatch legend-check"></span> CHECK
+            </span>
+            <span class="legend-item">
+              <span class="legend-swatch legend-ok"></span> OK
+            </span>
+            <span class="legend-item">
+              <span class="legend-swatch legend-offline"></span> OFFLINE / EMPTY
+            </span>
+          </div>
+        </div>
+        <div id="room-grid" class="rooms-grid">
+          <!-- Room tiles injected by JS -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // -------- Data model --------
+
+    const FALL_ROOM_NUMBER = "103";
+
+    // Baseline statuses (before demo fall override)
+    const baseRooms = [
+      { number: "101", status: "OK" },
+      { number: "102", status: "OK" },
+      { number: "103", status: "OK" },   // toggling demo
+      { number: "104", status: "EMPTY" },
+      { number: "105", status: "CHECK" },
+      { number: "106", status: "OK" },
+      { number: "107", status: "OK" },
+      { number: "108", status: "EMPTY" },
+      { number: "109", status: "OFFLINE" },
+      { number: "110", status: "OK" },
+      { number: "111", status: "OK" },
+      { number: "112", status: "OK" },
+      { number: "113", status: "EMPTY" },
+      { number: "114", status: "OK" },
+      { number: "115", status: "OK" },
+      { number: "116", status: "EMPTY" },
+      { number: "117", status: "OK" },
+      { number: "118", status: "OK" }
+    ];
+
+    // Demo state
+    let fallActive = true;       // whether the fall is currently "on"
+    let fallAcknowledged = false;
+
+    // -------- Clock (optional) --------
+
+    function updateClock() {
+      const now = new Date();
+      const timeEl = document.getElementById("clock-time");
+      const dateEl = document.getElementById("clock-date");
+      if (!timeEl || !dateEl) return;
+
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+      timeEl.textContent = hours + ":" + minutes;
+
+      const weekdayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+      const weekday = weekdayNames[now.getDay()];
+      const day = String(now.getDate()).padStart(2, "0");
+      const month = monthNames[now.getMonth()];
+
+      dateEl.textContent = weekday + " " + day + " " + month;
+    }
+
+    // -------- Rendering: rooms --------
+
+    function getDisplayStatus(room) {
+      if (room.number === FALL_ROOM_NUMBER) {
+        return fallActive ? "FALL" : "OK";
+      }
+      return room.status;
+    }
+
+    function statusToClass(status) {
+      switch (status) {
+        case "FALL":
+          return "status-fall";
+        case "OK":
+          return "status-ok";
+        case "CHECK":
+          return "status-check";
+        case "OFFLINE":
+          return "status-offline";
+        case "EMPTY":
+          return "status-empty";
+        default:
+          return "status-empty";
+      }
+    }
+
+    function renderRooms() {
+      const grid = document.getElementById("room-grid");
+      if (!grid) return;
+
+      grid.innerHTML = "";
+
+      baseRooms.forEach((room) => {
+        const status = getDisplayStatus(room);
+        const tile = document.createElement("div");
+        tile.className = "room-tile " + statusToClass(status);
+
+        const header = document.createElement("div");
+        header.className = "room-header";
+
+        const number = document.createElement("div");
+        number.className = "room-number";
+        number.textContent = "Room " + room.number;
+
+        const dot = document.createElement("div");
+        dot.className = "room-dot";
+
+        header.appendChild(number);
+        header.appendChild(dot);
+
+        const statusText = document.createElement("div");
+        statusText.className = "room-status";
+        statusText.textContent = status;
+
+        tile.appendChild(header);
+        tile.appendChild(statusText);
+
+        grid.appendChild(tile);
+      });
+    }
+
+    // -------- Rendering: alerts --------
+
+    function renderAlerts() {
+      const list = document.getElementById("alerts-list");
+      const badge = document.getElementById("alerts-badge");
+      if (!list || !badge) return;
+
+      list.innerHTML = "";
+
+      const activeAlerts = fallActive ? 1 : 0;
+
+      // Badge
+      badge.textContent = activeAlerts + " active";
+      if (activeAlerts > 0) {
+        badge.classList.remove("badge-green");
+        badge.classList.add("badge-red");
+      } else {
+        badge.classList.remove("badge-red");
+        badge.classList.add("badge-green");
+      }
+
+      if (activeAlerts === 0) {
+        const empty = document.createElement("div");
+        empty.className = "alert-empty";
+        empty.textContent = "No active fall alerts on this floor.";
+        list.appendChild(empty);
+        return;
+      }
+
+      // Single demo alert for FALL_ROOM_NUMBER
+      const card = document.createElement("article");
+      card.className = "alert-card";
+
+      const banner = document.createElement("div");
+      banner.className = "alert-banner";
+      banner.textContent = "FALL ALERT";
+
+      const body = document.createElement("div");
+      body.className = "alert-body";
+
+      const topRow = document.createElement("div");
+      topRow.className = "alert-top-row";
+
+      const roomLabel = document.createElement("div");
+      roomLabel.className = "alert-room";
+      roomLabel.textContent = "Room " + FALL_ROOM_NUMBER;
+
+      const timeLabel = document.createElement("div");
+      timeLabel.className = "alert-time";
+      timeLabel.textContent = "Detected just now";
+
+      topRow.appendChild(roomLabel);
+      topRow.appendChild(timeLabel);
+
+      const sub = document.createElement("div");
+      sub.className = "alert-sub";
+      sub.textContent = "Demo: this room switches between FALL and OK every ~12 seconds.";
+
+      body.appendChild(topRow);
+      body.appendChild(sub);
+
+      const footer = document.createElement("div");
+      footer.className = "alert-footer";
+
+      const button = document.createElement("button");
+      button.className =
+        "alert-button" + (fallAcknowledged ? " ack" : "");
+      button.textContent = fallAcknowledged ? "Acknowledged" : "Acknowledge";
+
+      button.addEventListener("click", () => {
+        fallAcknowledged = !fallAcknowledged;
+        renderAlerts();
+      });
+
+      footer.appendChild(button);
+
+      card.appendChild(banner);
+      card.appendChild(body);
+      card.appendChild(footer);
+
+      list.appendChild(card);
+    }
+
+    // -------- Demo fall toggle --------
+
+    function toggleFall() {
+      fallActive = !fallActive;
+      fallAcknowledged = false; // new event when it comes back on
+      renderRooms();
+      renderAlerts();
+    }
+
+    // -------- Init --------
+
+    document.addEventListener("DOMContentLoaded", () => {
+      updateClock();
+      renderRooms();
+      renderAlerts();
+
+      // Update clock every 30s
+      setInterval(updateClock, 30000);
+
+      // Toggle the demo fall every ~12 seconds
+      setInterval(toggleFall, 12000);
+    });
+  </script>
+</body>
+</html>
