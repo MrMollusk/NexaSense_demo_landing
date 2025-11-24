@@ -6,20 +6,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
-      --bg-main: #e5e7eb;      /* slate-200 */
+      /* Brand / base */
+      --primary-blue: #1d9bf0;   /* main brand blue */
+      --light-blue: #a5d8ff;     /* soft info/“check” blue */
+      --bg-main: #eaf4ff;        /* page background */
       --bg-card: #ffffff;
-      --bg-header: #020617;    /* slate-950 */
-      --text-main: #020617;
-      --text-subtle: #6b7280;  /* gray-500 */
-      --border-subtle: #e5e7eb;
+      --bg-header: #1d9bf0;      /* header bar */
+      --text-main: #0b1120;      /* dark navy text */
+      --text-subtle: #64748b;    /* blue-grey */
+      --border-subtle: #dbeafe;
 
-      --fall-bg: #b91c1c;      /* red-700 */
-      --fall-light: #fee2e2;   /* red-100 */
+      /* Critical fall alert (kept red for clarity) */
+      --fall-bg: #b91c1c;        /* red */
+      --fall-light: #fee2e2;
 
-      --ok-bg: #10b981;        /* emerald-500 */
-      --check-bg: #f59e0b;     /* amber-500 */
-      --offline-bg: #9ca3af;   /* gray-400 */
-      --empty-bg: #f3f4f6;     /* gray-100 */
+      /* Status colours */
+      --ok-bg: #1d9bf0;          /* blue “OK” */
+      --check-bg: #a5d8ff;       /* pale blue “CHECK” */
+      --offline-bg: #cbd5f5;     /* bluish grey */
+      --empty-bg: #f8fafc;       /* almost white */
     }
 
     * {
@@ -50,8 +55,8 @@
       border-radius: 16px;
       overflow: hidden;
       box-shadow:
-        0 10px 30px rgba(15, 23, 42, 0.3),
-        0 0 0 1px rgba(15, 23, 42, 0.06);
+        0 10px 30px rgba(15, 23, 42, 0.25),
+        0 0 0 1px rgba(148, 163, 184, 0.25);
       display: flex;
       flex-direction: column;
     }
@@ -69,8 +74,27 @@
 
     .header-left {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: 12px;
+    }
+
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary-blue);
+    }
+
+    .header-left-text {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
     }
 
     .brand {
@@ -81,7 +105,7 @@
 
     .subheader {
       font-size: 13px;
-      color: #9ca3af;
+      color: #e0f2fe;
     }
 
     .header-right {
@@ -102,7 +126,7 @@
 
     .time-block-sub {
       font-size: 11px;
-      color: #9ca3af;
+      color: #e0f2fe;
     }
 
     .user-block {
@@ -115,12 +139,12 @@
       width: 32px;
       height: 32px;
       border-radius: 999px;
-      background: #1f2933;
+      background: rgba(15, 23, 42, 0.4);
     }
 
     .user-label {
       font-size: 13px;
-      color: #e5e7eb;
+      color: #e0f2fe;
     }
 
     /* Layout */
@@ -174,8 +198,8 @@
     }
 
     .badge-green {
-      background: #dcfce7;
-      color: #166534;
+      background: #dbeafe;
+      color: #1d4ed8;
     }
 
     /* Alerts */
@@ -253,16 +277,16 @@
     }
 
     .alert-button.ack {
-      border-color: #d1d5db;
-      background: #f3f4f6;
-      color: #374151;
+      border-color: #cbd5e1;
+      background: #e2e8f0;
+      color: #0f172a;
     }
 
     .alert-empty {
       border-radius: 12px;
-      border: 1px solid #bbf7d0;
-      background: #dcfce7;
-      color: #166534;
+      border: 1px solid #bfdbfe;
+      background: #dbeafe;
+      color: #1d4ed8;
       padding: 10px 12px;
       font-size: 13px;
     }
@@ -292,8 +316,8 @@
     }
 
     .legend-fall { background: var(--fall-bg); }
-    .legend-check { background: var(--check-bg); }
-    .legend-ok { background: var(--ok-bg); }
+    .legend-check { background: var(--light-blue); }
+    .legend-ok { background: var(--primary-blue); }
     .legend-offline { background: var(--offline-bg); }
 
     .rooms-grid {
@@ -315,7 +339,7 @@
       box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
       text-align: left;
       background: var(--empty-bg);
-      color: #111827;
+      color: var(--text-main);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -341,7 +365,7 @@
       width: 10px;
       height: 10px;
       border-radius: 999px;
-      background: #9ca3af;
+      background: #94a3b8;
     }
 
     .room-status {
@@ -349,7 +373,7 @@
       font-weight: 600;
     }
 
-    /* Status color variants */
+    /* Status colour variants */
 
     .status-fall {
       background: var(--fall-bg);
@@ -366,31 +390,31 @@
       border-color: var(--ok-bg);
     }
     .status-ok .room-dot {
-      background: #f9fafb;
+      background: #e0f2fe;
     }
 
     .status-check {
       background: var(--check-bg);
-      color: #111827;
+      color: #0b1120;
       border-color: var(--check-bg);
     }
     .status-check .room-dot {
-      background: #111827cc;
+      background: #0b1120d9;
     }
 
     .status-offline {
       background: var(--offline-bg);
-      color: #111827;
+      color: #0b1120;
       border-color: var(--offline-bg);
     }
     .status-offline .room-dot {
-      background: #111827;
+      background: #020617;
     }
 
     .status-empty {
       background: var(--empty-bg);
-      color: #6b7280;
-      border-color: #e5e7eb;
+      color: #64748b;
+      border-color: #dbeafe;
     }
     .status-empty .room-dot {
       background: #9ca3af;
@@ -404,7 +428,7 @@
       background: transparent;
     }
     .alerts-list::-webkit-scrollbar-thumb {
-      background: #d1d5db;
+      background: #cbd5e1;
       border-radius: 999px;
     }
 
@@ -426,8 +450,12 @@
     <!-- Header -->
     <header class="header">
       <div class="header-left">
-        <div class="brand">NexaSense</div>
-        <div class="subheader">Floor 1 • 18 rooms</div>
+        <!-- Simple circular mark; swap for your logo img if you want -->
+        <div class="brand-mark">N</div>
+        <div class="header-left-text">
+          <div class="brand">NexaSense</div>
+          <div class="subheader">Floor 1 • 18 rooms</div>
+        </div>
       </div>
       <div class="header-right">
         <div class="time-block">
@@ -481,11 +509,8 @@
   </div>
 
   <script>
-    // -------- Data model --------
-
     const FALL_ROOM_NUMBER = "103";
 
-    // Baseline statuses (before demo fall override)
     const baseRooms = [
       { number: "101", status: "OK" },
       { number: "102", status: "OK" },
@@ -507,11 +532,8 @@
       { number: "118", status: "OK" }
     ];
 
-    // Demo state
-    let fallActive = true;       // whether the fall is currently "on"
+    let fallActive = true;
     let fallAcknowledged = false;
-
-    // -------- Clock (optional) --------
 
     function updateClock() {
       const now = new Date();
@@ -532,8 +554,6 @@
 
       dateEl.textContent = weekday + " " + day + " " + month;
     }
-
-    // -------- Rendering: rooms --------
 
     function getDisplayStatus(room) {
       if (room.number === FALL_ROOM_NUMBER) {
@@ -594,8 +614,6 @@
       });
     }
 
-    // -------- Rendering: alerts --------
-
     function renderAlerts() {
       const list = document.getElementById("alerts-list");
       const badge = document.getElementById("alerts-badge");
@@ -605,7 +623,6 @@
 
       const activeAlerts = fallActive ? 1 : 0;
 
-      // Badge
       badge.textContent = activeAlerts + " active";
       if (activeAlerts > 0) {
         badge.classList.remove("badge-green");
@@ -623,7 +640,6 @@
         return;
       }
 
-      // Single demo alert for FALL_ROOM_NUMBER
       const card = document.createElement("article");
       card.className = "alert-card";
 
@@ -650,7 +666,8 @@
 
       const sub = document.createElement("div");
       sub.className = "alert-sub";
-      sub.textContent = "Demo: this room switches between FALL and OK every ~12 seconds.";
+      sub.textContent =
+        "Demo: this room switches between FALL and OK every ~12 seconds.";
 
       body.appendChild(topRow);
       body.appendChild(sub);
@@ -677,26 +694,19 @@
       list.appendChild(card);
     }
 
-    // -------- Demo fall toggle --------
-
     function toggleFall() {
       fallActive = !fallActive;
-      fallAcknowledged = false; // new event when it comes back on
+      fallAcknowledged = false;
       renderRooms();
       renderAlerts();
     }
-
-    // -------- Init --------
 
     document.addEventListener("DOMContentLoaded", () => {
       updateClock();
       renderRooms();
       renderAlerts();
 
-      // Update clock every 30s
       setInterval(updateClock, 30000);
-
-      // Toggle the demo fall every ~12 seconds
       setInterval(toggleFall, 12000);
     });
   </script>
