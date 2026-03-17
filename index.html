@@ -1,720 +1,343 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>NexaSense – Floor 1 Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root {
-      /* Brand / base */
-      --primary-blue: #1d9bf0;
-      --light-blue: #a5d8ff;
-      --bg-main: #eaf4ff;
-      --bg-card: #ffffff;
-      --bg-header: #1d9bf0;
-      --text-main: #0b1120;
-      --text-subtle: #64748b;
-      --border-subtle: #dbeafe;
-
-      /* Critical fall alert (kept red) */
-      --fall-bg: #b91c1c;
-      --fall-light: #fee2e2;
-
-      /* Status colours */
-      --ok-bg: #1d9bf0;
-      --check-bg: #a5d8ff;
-      --offline-bg: #cbd5f5;
-      --empty-bg: #f8fafc;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
-      color: var(--text-main);
-      background-color: var(--bg-main);
-    }
-
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: stretch;
-      padding: 16px;
-    }
-
-    .shell {
-      width: 100%;
-      max-width: 1200px;
-      background: var(--bg-card);
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow:
-        0 10px 30px rgba(15, 23, 42, 0.25),
-        0 0 0 1px rgba(148, 163, 184, 0.25);
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Header */
-
-    .header {
-      background: var(--bg-header);
-      color: #f9fafb;
-      padding: 12px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .brand-logo {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 3px;
-      box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.35);
-    }
-
-    .brand-logo img {
-      max-width: 100%;
-      max-height: 100%;
-      display: block;
-    }
-
-    .header-left-text {
-      display: flex;
-      align-items: baseline;
-      gap: 10px;
-    }
-
-    .brand {
-      font-size: 20px;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-    }
-
-    .subheader {
-      font-size: 13px;
-      color: #e0f2fe;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      font-size: 13px;
-    }
-
-    .time-block {
-      text-align: right;
-      line-height: 1.2;
-    }
-
-    .time-block-main {
-      font-size: 14px;
-    }
-
-    .time-block-sub {
-      font-size: 11px;
-      color: #e0f2fe;
-    }
-
-    .user-block {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.4);
-    }
-
-    .user-label {
-      font-size: 13px;
-      color: #e0f2fe;
-    }
-
-    /* Layout */
-
-    .main {
-      flex: 1;
-      padding: 16px;
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .column-left {
-      flex: 0 0 340px;
-      max-width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .column-right {
-      flex: 1 1 0;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      min-width: 0;
-    }
-
-    .section-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .section-title {
-      font-size: 17px;
-      font-weight: 600;
-    }
-
-    .badge {
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-
-    .badge-red {
-      background: #fee2e2;
-      color: #b91c1c;
-    }
-
-    .badge-green {
-      background: #dbeafe;
-      color: #1d4ed8;
-    }
-
-    /* Alerts */
-
-    .alerts-list {
-      max-height: 460px;
-      overflow-y: auto;
-      padding-right: 4px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .alert-card {
-      border-radius: 12px;
-      border: 1px solid #fecaca;
-      background: var(--fall-light);
-      overflow: hidden;
-      font-size: 14px;
-    }
-
-    .alert-banner {
-      background: var(--fall-bg);
-      color: white;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 6px 12px;
-    }
-
-    .alert-body {
-      padding: 8px 12px 4px 12px;
-    }
-
-    .alert-top-row {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 4px;
-    }
-
-    .alert-room {
-      font-size: 15px;
-      font-weight: 600;
-    }
-
-    .alert-time {
-      font-size: 11px;
-      color: #4b5563;
-      white-space: nowrap;
-    }
-
-    .alert-sub {
-      font-size: 11px;
-      color: #4b5563;
-      margin-bottom: 4px;
-    }
-
-    .alert-footer {
-      padding: 0 12px 10px 12px;
-    }
-
-    .alert-button {
-      width: 100%;
-      border-radius: 8px;
-      padding: 6px 10px;
-      font-size: 13px;
-      font-weight: 600;
-      border: 1px solid var(--fall-bg);
-      background: var(--fall-bg);
-      color: white;
-      cursor: pointer;
-    }
-
-    .alert-button.ack {
-      border-color: #cbd5e1;
-      background: #e2e8f0;
-      color: #0f172a;
-    }
-
-    .alert-empty {
-      border-radius: 12px;
-      border: 1px solid #bfdbfe;
-      background: #dbeafe;
-      color: #1d4ed8;
-      padding: 10px 12px;
-      font-size: 13px;
-    }
-
-    /* Floor overview */
-
-    .legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      font-size: 11px;
-      color: var(--text-subtle);
-      justify-content: flex-end;
-    }
-
-    .legend-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .legend-swatch {
-      width: 12px;
-      height: 12px;
-      border-radius: 3px;
-      background: var(--bg-main);
-    }
-
-    .legend-fall { background: var(--fall-bg); }
-    .legend-check { background: var(--light-blue); }
-    .legend-ok { background: var(--primary-blue); }
-    .legend-offline { background: var(--offline-bg); }
-
-    .rooms-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    @media (min-width: 768px) {
-      .rooms-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-    }
-
-    .room-tile {
-      border-radius: 14px;
-      padding: 10px 10px 10px 10px;
-      border: 1px solid var(--border-subtle);
-      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
-      text-align: left;
-      background: var(--empty-bg);
-      color: var(--text-main);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-height: 80px;
-      cursor: default;
-      outline: none;
-    }
-
-    .room-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 12px;
-      margin-bottom: 4px;
-    }
-
-    .room-number {
-      font-size: 15px;
-      font-weight: 600;
-    }
-
-    .room-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 999px;
-      background: #94a3b8;
-    }
-
-    .room-status {
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    /* Status colour variants */
-
-    .status-fall {
-      background: var(--fall-bg);
-      color: #f9fafb;
-      border-color: var(--fall-bg);
-    }
-    .status-fall .room-dot {
-      background: #f9fafb;
-    }
-
-    .status-ok {
-      background: var(--ok-bg);
-      color: #f9fafb;
-      border-color: var(--ok-bg);
-    }
-    .status-ok .room-dot {
-      background: #e0f2fe;
-    }
-
-    .status-check {
-      background: var(--check-bg);
-      color: #0b1120;
-      border-color: var(--check-bg);
-    }
-    .status-check .room-dot {
-      background: #0b1120d9;
-    }
-
-    .status-offline {
-      background: var(--offline-bg);
-      color: #0b1120;
-      border-color: var(--offline-bg);
-    }
-    .status-offline .room-dot {
-      background: #020617;
-    }
-
-    .status-empty {
-      background: var(--empty-bg);
-      color: #64748b;
-      border-color: #dbeafe;
-    }
-    .status-empty .room-dot {
-      background: #9ca3af;
-    }
-
-    /* Scrollbar tweak */
-    .alerts-list::-webkit-scrollbar {
-      width: 6px;
-    }
-    .alerts-list::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    .alerts-list::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 999px;
-    }
-
-    @media (max-width: 900px) {
-      body {
-        padding: 8px;
-      }
-      .main {
-        flex-direction: column;
-      }
-      .column-left {
-        flex: 1 1 auto;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="shell">
-    <!-- Header -->
-    <header class="header">
-      <div class="header-left">
-        <div class="brand-logo">
-          <img src="nexasense-logo.png" alt="NexaSense logo">
-        </div>
-        <div class="header-left-text">
-          <div class="brand">NexaSense</div>
-          <div class="subheader">Floor 1 • 18 rooms</div>
-        </div>
-      </div>
-      <div class="header-right">
-        <div class="time-block">
-          <div class="time-block-main" id="clock-time">10:45</div>
-          <div class="time-block-sub" id="clock-date">Wed 12 Mar</div>
-        </div>
-        <div class="user-block">
-          <div class="avatar"></div>
-          <div class="user-label">Nurse station</div>
-        </div>
-      </div>
-    </header>
-
-    <!-- Main layout -->
-    <main class="main">
-      <!-- Left: Active falls -->
-      <section class="column-left">
-        <div class="section-header">
-          <div class="section-title">Active falls</div>
-          <div id="alerts-badge" class="badge badge-green">0 active</div>
-        </div>
-        <div id="alerts-list" class="alerts-list">
-          <!-- Alerts injected by JS -->
-        </div>
-      </section>
-
-      <!-- Right: Floor overview -->
-      <section class="column-right">
-        <div class="section-header">
-          <div class="section-title">Floor 1 overview</div>
-          <div class="legend">
-            <span class="legend-item">
-              <span class="legend-swatch legend-fall"></span> FALL
-            </span>
-            <span class="legend-item">
-              <span class="legend-swatch legend-check"></span> CHECK
-            </span>
-            <span class="legend-item">
-              <span class="legend-swatch legend-ok"></span> OK
-            </span>
-            <span class="legend-item">
-              <span class="legend-swatch legend-offline"></span> OFFLINE / EMPTY
-            </span>
+export default function NexaSenseLandingPage() {
+  const stats = [
+    { value: 'Privacy-first', label: 'No cameras. No wearables. On-device sensing.' },
+    { value: 'Radar-based', label: 'mmWave sensing built for resident rooms and care workflows.' },
+    { value: 'Care-home focused', label: 'Designed for operators who need fewer missed incidents and clearer accountability.' },
+  ];
+
+  const problems = [
+    'Falls and long-lies can be missed when staff are stretched across multiple residents.',
+    'Cameras create privacy resistance from residents, families, and operators.',
+    'Wearables fail in practice because residents remove them, forget them, or refuse them.',
+    'When incidents happen, care teams often lack a clear timeline of what actually occurred.',
+  ];
+
+  const features = [
+    {
+      title: 'Detect critical room events',
+      description:
+        'Identify falls, long-lies, and other high-risk room events using privacy-preserving radar sensing.',
+    },
+    {
+      title: 'Preserve dignity',
+      description:
+        'No video footage. No microphones. No wearable dependency. Just room-level sensing built around privacy.',
+    },
+    {
+      title: 'Fit real workflows',
+      description:
+        'Designed to plug into care-home operations with clear alerts, incident timelines, and room-level visibility.',
+    },
+    {
+      title: 'Process locally first',
+      description:
+        'Core detection runs on-device so the system remains privacy-first, resilient, and operationally sane.',
+    },
+  ];
+
+  const principles = [
+    'Built for care homes, not generic “smart home” nonsense.',
+    'Offline-first and local-first where it matters.',
+    'Privacy by design from the sensing layer upward.',
+    'Structured event timelines for accountability and review.',
+    'Made for scalable deployment across rooms and sites.',
+  ];
+
+  const steps = [
+    {
+      step: '01',
+      title: 'Install in-room radar device',
+      text: 'A compact sensor is installed in the resident room to monitor spatial movement patterns without using cameras or wearables.',
+    },
+    {
+      step: '02',
+      title: 'Detect and classify events locally',
+      text: 'On-device models process room activity and flag high-risk events such as falls or prolonged time on the ground.',
+    },
+    {
+      step: '03',
+      title: 'Surface alerts and timelines',
+      text: 'Care teams receive actionable event information with a structured incident view rather than vague noise.',
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-neutral-950 text-white">
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.18),transparent_28%),radial-gradient(circle_at_80%_20%,rgba(16,185,129,0.12),transparent_24%)]" />
+
+      <header className="sticky top-0 z-30 border-b border-white/10 bg-neutral-950/80 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-sm font-semibold tracking-wide">
+              NS
+            </div>
+            <div>
+              <div className="text-sm font-semibold tracking-wide text-white">NexaSense</div>
+              <div className="text-xs text-neutral-400">Privacy-first room monitoring for care homes</div>
+            </div>
           </div>
+          <nav className="hidden items-center gap-8 text-sm text-neutral-300 md:flex">
+            <a href="#solution" className="transition hover:text-white">Solution</a>
+            <a href="#how-it-works" className="transition hover:text-white">How it works</a>
+            <a href="#privacy" className="transition hover:text-white">Privacy</a>
+            <a href="#contact" className="transition hover:text-white">Contact</a>
+          </nav>
+          <a
+            href="#contact"
+            className="rounded-2xl border border-white/15 bg-white px-4 py-2 text-sm font-medium text-neutral-950 transition hover:bg-neutral-200"
+          >
+            Book a pilot discussion
+          </a>
         </div>
-        <div id="room-grid" class="rooms-grid">
-          <!-- Room tiles injected by JS -->
-        </div>
-      </section>
-    </main>
-  </div>
+      </header>
 
-  <script>
-    const FALL_ROOM_NUMBER = "103";
+      <main>
+        <section className="mx-auto grid max-w-7xl gap-16 px-6 pb-20 pt-20 lg:grid-cols-[1.2fr_0.8fr] lg:px-8 lg:pb-28 lg:pt-28">
+          <div>
+            <div className="mb-6 inline-flex items-center rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm text-emerald-200">
+              Built for care homes that need fewer missed incidents and better visibility
+            </div>
+            <h1 className="max-w-4xl text-5xl font-semibold leading-tight tracking-tight text-white md:text-6xl">
+              Detect falls and long-lies without cameras, wearables, or invasive monitoring.
+            </h1>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-neutral-300">
+              NexaSense uses privacy-first mmWave radar and on-device intelligence to monitor resident rooms,
+              surface critical events, and give care teams clearer incident visibility without compromising dignity.
+            </p>
+            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+              <a
+                href="#contact"
+                className="rounded-2xl bg-white px-6 py-3 text-center text-sm font-semibold text-neutral-950 transition hover:bg-neutral-200"
+              >
+                Request a pilot
+              </a>
+              <a
+                href="#solution"
+                className="rounded-2xl border border-white/15 bg-white/5 px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-white/10"
+              >
+                See how it works
+              </a>
+            </div>
+            <div className="mt-10 grid gap-4 sm:grid-cols-3">
+              {stats.map((stat) => (
+                <div key={stat.value} className="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
+                  <div className="text-base font-semibold text-white">{stat.value}</div>
+                  <div className="mt-2 text-sm leading-6 text-neutral-400">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
 
-    const baseRooms = [
-      { number: "101", status: "OK" },
-      { number: "102", status: "OK" },
-      { number: "103", status: "OK" },   // toggling demo
-      { number: "104", status: "EMPTY" },
-      { number: "105", status: "CHECK" },
-      { number: "106", status: "OK" },
-      { number: "107", status: "OK" },
-      { number: "108", status: "EMPTY" },
-      { number: "109", status: "OFFLINE" },
-      { number: "110", status: "OK" },
-      { number: "111", status: "OK" },
-      { number: "112", status: "OK" },
-      { number: "113", status: "EMPTY" },
-      { number: "114", status: "OK" },
-      { number: "115", status: "OK" },
-      { number: "116", status: "EMPTY" },
-      { number: "117", status: "OK" },
-      { number: "118", status: "OK" }
-    ];
+          <div className="relative">
+            <div className="absolute -inset-4 rounded-[2rem] bg-white/5 blur-2xl" />
+            <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-neutral-900 shadow-2xl">
+              <div className="border-b border-white/10 px-5 py-4">
+                <div className="text-sm font-medium text-neutral-300">Resident Room Event Overview</div>
+              </div>
+              <div className="space-y-5 p-5">
+                <div className="rounded-2xl border border-red-400/20 bg-red-400/10 p-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <div className="text-sm font-medium text-red-200">High-priority event</div>
+                      <div className="mt-1 text-lg font-semibold text-white">Possible fall detected</div>
+                    </div>
+                    <div className="rounded-full border border-red-300/20 bg-red-300/10 px-3 py-1 text-xs font-medium text-red-200">
+                      Room 12
+                    </div>
+                  </div>
+                  <div className="mt-4 grid grid-cols-3 gap-3 text-sm">
+                    <div className="rounded-xl bg-black/20 p-3">
+                      <div className="text-neutral-400">Time</div>
+                      <div className="mt-1 font-medium text-white">02:14</div>
+                    </div>
+                    <div className="rounded-xl bg-black/20 p-3">
+                      <div className="text-neutral-400">Status</div>
+                      <div className="mt-1 font-medium text-white">No recovery</div>
+                    </div>
+                    <div className="rounded-xl bg-black/20 p-3">
+                      <div className="text-neutral-400">Signal</div>
+                      <div className="mt-1 font-medium text-white">Radar event</div>
+                    </div>
+                  </div>
+                </div>
 
-    let fallActive = true;
-    let fallAcknowledged = false;
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <div className="text-sm font-medium text-white">Incident timeline</div>
+                  <div className="mt-4 space-y-3">
+                    {[
+                      '02:12 — Resident movement pattern changed',
+                      '02:14 — Sudden downward motion detected',
+                      '02:15 — Ground-level presence sustained',
+                      '02:16 — Alert escalated to staff workflow',
+                    ].map((item) => (
+                      <div key={item} className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-neutral-300">
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-    function updateClock() {
-      const now = new Date();
-      const timeEl = document.getElementById("clock-time");
-      const dateEl = document.getElementById("clock-date");
-      if (!timeEl || !dateEl) return;
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <div className="text-sm text-neutral-400">Approach</div>
+                    <div className="mt-2 text-base font-semibold text-white">Camera-free monitoring</div>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <div className="text-sm text-neutral-400">Deployment</div>
+                    <div className="mt-2 text-base font-semibold text-white">Room-by-room rollout</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
-      const hours = String(now.getHours()).padStart(2, "0");
-      const minutes = String(now.getMinutes()).padStart(2, "0");
-      timeEl.textContent = hours + ":" + minutes;
+        <section className="border-y border-white/10 bg-black/20">
+          <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+            <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+              <div>
+                <div className="text-sm font-semibold uppercase tracking-[0.22em] text-emerald-200">The problem</div>
+                <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white md:text-4xl">
+                  Existing room monitoring options are either invasive, unreliable, or operationally useless.
+                </h2>
+              </div>
+              <div className="grid gap-4">
+                {problems.map((problem) => (
+                  <div key={problem} className="rounded-3xl border border-white/10 bg-white/5 p-5 text-base leading-7 text-neutral-300">
+                    {problem}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
 
-      const weekdayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-      const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        <section id="solution" className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-28">
+          <div className="max-w-3xl">
+            <div className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-200">The solution</div>
+            <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white md:text-4xl">
+              A privacy-first sensing layer for care homes.
+            </h2>
+            <p className="mt-5 text-lg leading-8 text-neutral-300">
+              NexaSense is built to give operators and care teams a better way to monitor high-risk resident rooms.
+              It focuses on the events that matter, preserves resident dignity, and avoids the operational failure modes
+              that make cameras and wearables a bad fit.
+            </p>
+          </div>
 
-      const weekday = weekdayNames[now.getDay()];
-      const day = String(now.getDate()).padStart(2, "0");
-      const month = monthNames[now.getMonth()];
+          <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            {features.map((feature) => (
+              <div key={feature.title} className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
+                <div className="text-lg font-semibold text-white">{feature.title}</div>
+                <p className="mt-3 text-sm leading-7 text-neutral-400">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
-      dateEl.textContent = weekday + " " + day + " " + month;
-    }
+        <section id="how-it-works" className="border-y border-white/10 bg-white/[0.03]">
+          <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-28">
+            <div className="max-w-3xl">
+              <div className="text-sm font-semibold uppercase tracking-[0.22em] text-violet-200">How it works</div>
+              <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white md:text-4xl">
+                Straightforward deployment. Clearer signal. Less nonsense.
+              </h2>
+            </div>
 
-    function getDisplayStatus(room) {
-      if (room.number === FALL_ROOM_NUMBER) {
-        return fallActive ? "FALL" : "OK";
-      }
-      return room.status;
-    }
+            <div className="mt-12 grid gap-5 lg:grid-cols-3">
+              {steps.map((item) => (
+                <div key={item.step} className="rounded-[2rem] border border-white/10 bg-neutral-900 p-6">
+                  <div className="text-sm font-semibold text-violet-200">{item.step}</div>
+                  <div className="mt-4 text-xl font-semibold text-white">{item.title}</div>
+                  <p className="mt-3 text-sm leading-7 text-neutral-400">{item.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
-    function statusToClass(status) {
-      switch (status) {
-        case "FALL":
-          return "status-fall";
-        case "OK":
-          return "status-ok";
-        case "CHECK":
-          return "status-check";
-        case "OFFLINE":
-          return "status-offline";
-        case "EMPTY":
-          return "status-empty";
-        default:
-          return "status-empty";
-      }
-    }
+        <section id="privacy" className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-28">
+          <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:items-start">
+            <div>
+              <div className="text-sm font-semibold uppercase tracking-[0.22em] text-emerald-200">Privacy by design</div>
+              <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white md:text-4xl">
+                Built around dignity, compliance, and operator reality.
+              </h2>
+              <p className="mt-5 text-lg leading-8 text-neutral-300">
+                Care homes do not need another surveillance product. They need better visibility into critical room events
+                without introducing a privacy disaster. NexaSense is designed to keep sensing practical, restrained, and
+                aligned with real deployment constraints.
+              </p>
+            </div>
 
-    function renderRooms() {
-      const grid = document.getElementById("room-grid");
-      if (!grid) return;
+            <div className="grid gap-4">
+              {principles.map((principle) => (
+                <div key={principle} className="rounded-3xl border border-white/10 bg-white/5 px-5 py-4 text-base text-neutral-300">
+                  {principle}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
-      grid.innerHTML = "";
+        <section className="mx-auto max-w-7xl px-6 pb-20 lg:px-8 lg:pb-28">
+          <div className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-8 shadow-2xl md:p-10">
+            <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+              <div>
+                <div className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-200">Why operators care</div>
+                <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white md:text-4xl">
+                  Better monitoring only matters if it actually works in the building.
+                </h2>
+                <p className="mt-5 max-w-2xl text-lg leading-8 text-neutral-300">
+                  NexaSense is designed for care-home deployment reality: room coverage, privacy constraints, incident review,
+                  and operational clarity. The point is not flashy technology. The point is fewer missed events and better
+                  visibility when something goes wrong.
+                </p>
+              </div>
+              <div className="grid gap-4">
+                {[
+                  'Reduce dependency on resident-worn devices',
+                  'Avoid privacy backlash from cameras in bedrooms',
+                  'Support faster recognition of high-risk incidents',
+                  'Create clearer post-incident accountability',
+                ].map((item) => (
+                  <div key={item} className="rounded-2xl border border-white/10 bg-black/20 px-5 py-4 text-sm font-medium text-neutral-200">
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
 
-      baseRooms.forEach((room) => {
-        const status = getDisplayStatus(room);
-        const tile = document.createElement("div");
-        tile.className = "room-tile " + statusToClass(status);
-
-        const header = document.createElement("div");
-        header.className = "room-header";
-
-        const number = document.createElement("div");
-        number.className = "room-number";
-        number.textContent = "Room " + room.number;
-
-        const dot = document.createElement("div");
-        dot.className = "room-dot";
-
-        header.appendChild(number);
-        header.appendChild(dot);
-
-        const statusText = document.createElement("div");
-        statusText.className = "room-status";
-        statusText.textContent = status;
-
-        tile.appendChild(header);
-        tile.appendChild(statusText);
-
-        grid.appendChild(tile);
-      });
-    }
-
-    function renderAlerts() {
-      const list = document.getElementById("alerts-list");
-      const badge = document.getElementById("alerts-badge");
-      if (!list || !badge) return;
-
-      list.innerHTML = "";
-
-      const activeAlerts = fallActive ? 1 : 0;
-
-      badge.textContent = activeAlerts + " active";
-      if (activeAlerts > 0) {
-        badge.classList.remove("badge-green");
-        badge.classList.add("badge-red");
-      } else {
-        badge.classList.remove("badge-red");
-        badge.classList.add("badge-green");
-      }
-
-      if (activeAlerts === 0) {
-        const empty = document.createElement("div");
-        empty.className = "alert-empty";
-        empty.textContent = "No active fall alerts on this floor.";
-        list.appendChild(empty);
-        return;
-      }
-
-      const card = document.createElement("article");
-      card.className = "alert-card";
-
-      const banner = document.createElement("div");
-      banner.className = "alert-banner";
-      banner.textContent = "FALL ALERT";
-
-      const body = document.createElement("div");
-      body.className = "alert-body";
-
-      const topRow = document.createElement("div");
-      topRow.className = "alert-top-row";
-
-      const roomLabel = document.createElement("div");
-      roomLabel.className = "alert-room";
-      roomLabel.textContent = "Room " + FALL_ROOM_NUMBER;
-
-      const timeLabel = document.createElement("div");
-      timeLabel.className = "alert-time";
-      timeLabel.textContent = "Detected just now";
-
-      topRow.appendChild(roomLabel);
-      topRow.appendChild(timeLabel);
-
-      const sub = document.createElement("div");
-      sub.className = "alert-sub";
-      sub.textContent =
-        "Demo: this room switches between FALL and OK every ~12 seconds.";
-
-      body.appendChild(topRow);
-      body.appendChild(sub);
-
-      const footer = document.createElement("div");
-      footer.className = "alert-footer";
-
-      const button = document.createElement("button");
-      button.className =
-        "alert-button" + (fallAcknowledged ? " ack" : "");
-      button.textContent = fallAcknowledged ? "Acknowledged" : "Acknowledge";
-
-      button.addEventListener("click", () => {
-        fallAcknowledged = !fallAcknowledged;
-        renderAlerts();
-      });
-
-      footer.appendChild(button);
-
-      card.appendChild(banner);
-      card.appendChild(body);
-      card.appendChild(footer);
-
-      list.appendChild(card);
-    }
-
-    function toggleFall() {
-      fallActive = !fallActive;
-      fallAcknowledged = false;
-      renderRooms();
-      renderAlerts();
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      updateClock();
-      renderRooms();
-      renderAlerts();
-
-      setInterval(updateClock, 30000);
-      setInterval(toggleFall, 12000);
-    });
-  </script>
-</body>
-</html>
+        <section id="contact" className="border-t border-white/10 bg-black/30">
+          <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+            <div className="mx-auto max-w-3xl text-center">
+              <div className="text-sm font-semibold uppercase tracking-[0.22em] text-emerald-200">Contact</div>
+              <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white md:text-5xl">
+                Explore a pilot deployment with NexaSense.
+              </h2>
+              <p className="mt-5 text-lg leading-8 text-neutral-300">
+                For care-home groups, operators, and partners evaluating privacy-first room monitoring.
+              </p>
+              <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+                <a
+                  href="mailto:hello@nexasense.ie"
+                  className="rounded-2xl bg-white px-6 py-3 text-sm font-semibold text-neutral-950 transition hover:bg-neutral-200"
+                >
+                  hello@nexasense.ie
+                </a>
+                <a
+                  href="https://www.linkedin.com"
+                  className="rounded-2xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                >
+                  LinkedIn
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
